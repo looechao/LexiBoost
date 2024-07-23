@@ -68,6 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         page = LikedPage();
         break;
+      case 2:
+        page = Placeholder();
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
@@ -88,6 +90,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       icon: Icon(Icons.favorite),
                       label: Text('Favorites'),
                     ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.chat_bubble), 
+                      label: Text('chat'))
                   ],
                   selectedIndex: selectedIndex,
                   onDestinationSelected: (value) {
@@ -158,12 +163,22 @@ class GeneratorPage extends StatelessWidget {
 class LikedPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var pair = appState.current;
 
     return ListView(
         children: [
           Text('Liked Idea:'),
           for(var msg in favorites)
-            Text(msg.first),
+            Card(
+              margin: EdgeInsets.all(8.0),
+              child: ListTile(
+              leading: Icon(Icons.favorite),
+              title: Text(msg.first),
+              subtitle: Text('Subtitle'),
+              trailing: Icon(Icons.arrow_forward),
+              ),
+            ),
         ],
     );
   }
