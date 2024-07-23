@@ -1,16 +1,51 @@
-# flutter_application_1
+### ROAD MAP
 
-A new Flutter project.
+- [x] ~~主页面设置~~
 
-## Getting Started
+- [x] ~~添加收藏列表~~
+- [x] ~~接入大语言模型（已经接入DeepSeek Chat）~~
+- [ ] 多词库功能
 
-This project is a starting point for a Flutter application.
+- [ ] 收藏列表优化
+  - [ ] 限定可收藏单词数量上限
+- [ ] API Key 的管理策略
 
-A few resources to get you started if this is your first Flutter project:
+- [ ] Prompt Engineering
+  - [ ] 性格设定（督促单词记忆型）
+  - [ ] 对话内容设定
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 环境搭建
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+##### Software requirements
+
+- VSCode
+- gradle
+- Android tool chain
+  - [x] **Android SDK Platform, API 34.0.5**
+  - [x] **Android SDK Command-line Tools**
+  - [x] **Android SDK Build-Tools**
+  - [x] **Android SDK Platform-Tools**
+  - [x] **Android Emulator**
+
+##### Internet requirements
+
+- Gradle Proxy (Dir: gradle.properties)
+
+  ```properties
+  org.gradle.jvmargs=-Xmx4G -XX:+HeapDumpOnOutOfMemoryError
+  android.useAndroidX=true
+  android.enableJetifier=true
+  systemProp.http.proxyHost=127.0.0.1
+  systemProp.https.proxyHost=127.0.0.1
+  systemProp.https.proxyPort=7890
+  systemProp.http.proxyPort=7890
+  ```
+
+- Git Proxy
+
+  ```git
+  git config --global http.proxy http://127.0.0.1:7890
+  git config --global https.proxy http://127.0.0.1:7890
+  ```
+
+  

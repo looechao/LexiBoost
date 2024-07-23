@@ -1,16 +1,10 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:langchain/langchain.dart';
-import 'package:langchain_ollama/langchain_ollama.dart';
-import 'package:langchain_core/chat_models.dart';
-import 'package:langchain_core/language_models.dart';
-import 'package:langchain_core/output_parsers.dart';
-import 'package:langchain_core/prompts.dart';
-import 'package:langchain_ollama/langchain_ollama.dart';
-import 'dart:convert';
+import 'package:langchain_openai/langchain_openai.dart';
+import 'dart:io';
+
 
 void main() {
   runApp(MyApp());
@@ -27,7 +21,7 @@ class MyApp extends StatelessWidget {
         title: 'Namer App',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         ),
         home: MyHomePage(),
       ),
@@ -208,7 +202,7 @@ class LikedPage extends StatelessWidget{
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: const Text(
            "Collection",
             style: TextStyle(fontWeight: FontWeight.bold),
@@ -233,6 +227,8 @@ class LikedPage extends StatelessWidget{
 }
 
 
+List<Map<String, dynamic>> _chatHistory = [];
+
 class ChatPage extends StatefulWidget {
   static const routeName = '/chat';
   const ChatPage({super.key});
@@ -244,54 +240,41 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _chatController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  List<Map<String, dynamic>> _chatHistory = [];
 
 
-void getAnswer() async {
-  // 初始化 ChatOllama 实例
-  final model = ChatOllama(
-    baseUrl: 'https://api.deepseek.com', // Base URL of Ollama API
-    headers: {
-      'Authorization': 'sk-d1267fe399324e28a47f5c41e0d2b88d', // Custom headers
-      'Custom-Header': 'Custom-Value',
-    },
-    queryParams: {
-      'param1': 'value1', // Custom query parameters
-      'param2': 'value2',
-    },
-    client: null, // Use the default HTTP client
-    defaultOptions: ChatOllamaOptions(
-      model: 'DeepSeek', // Default model to use
-    ),
-    encoding: 'cl100k_base', // Encoding to use
-  );
+  void getAnswer() async {
+    final togetherAiApiKey = Platform.environment['sk-d1267fe399324e28a47f5c41e0d2b88d'];
 
-  // Now you can use the chatOllama instance to interact with the Ollama API
-  // For example, you can send a request to generate text
-  final messages = [
-    ChatMessage.humanText('say hi!'),
-  ];
+    final promptTemplate = ChatPromptTemplate.fromTemplates(const [
+      (
+        ChatMessageType.system,
+        'You are a helpful assistant',
+      ),
+      (ChatMessageType.human, '{text}'),
+    ]);
 
-  try {
-    // 发送请求并获取响应
-    final response = await model.call(messages);
+    final chatModel = ChatOpenAI(
+      apiKey: 'sk-d1267fe399324e28a47f5c41e0d2b88d',
+      baseUrl: 'https://api.deepseek.com',
+      defaultOptions: const ChatOpenAIOptions(
+       model: 'deepseek-chat',
+      ),
+    );
+    
+    final chain = promptTemplate | chatModel | const StringOutputParser();
 
+    String? lastSenderMessage = _chatHistory.lastWhere(
+      (record) => record['isSender'] == true,
+    )?['message'];
 
-    // 将响应结果添加到 _chatHistory
+    final res = await chain.invoke({
+      'text': lastSenderMessage,
+    });
     _chatHistory.add({
       "time": DateTime.now(),
-      "message": response,
+      "message": res,
       "isSender": false,
     });
-    } catch (e) {
-    // 处理错误
-    print('Error: $e');
-    _chatHistory.add({
-      "time": DateTime.now(),
-      "message": 'Error: $e',
-      "isSender": false,
-    });
-    }
   }
 
 
@@ -335,7 +318,7 @@ void getAnswer() async {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text(
           "Chat",
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -344,7 +327,7 @@ void getAnswer() async {
       body: Stack(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height - 160,
+            height: MediaQuery.of(context).size.height - 100,
             child: ListView.builder(
               itemCount: _chatHistory.length,
               shrinkWrap: false,
@@ -389,13 +372,13 @@ void getAnswer() async {
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               height: 60,
               width: double.infinity,
-              color: Theme.of(context).colorScheme.inversePrimary,
+              color: Theme.of(context).colorScheme.onInverseSurface,
               child: Row(
                 children: [
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
+                        color: Theme.of(context).colorScheme.inversePrimary,
                         borderRadius: BorderRadius.all(Radius.circular(50.0)),
                       ),
                       child: Padding(
@@ -433,15 +416,8 @@ void getAnswer() async {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(80.0)),
                     padding: const EdgeInsets.all(0.0),
                     child: Ink(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFF7D96E6),
-                            Color(0xFF7D96E6),
-                          ],
-                        ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.inversePrimary,
                         borderRadius: BorderRadius.all(Radius.circular(50.0)),
                       ),
                       child: Container(

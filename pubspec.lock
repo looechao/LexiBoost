@@ -164,7 +164,7 @@ packages:
     source: hosted
     version: "0.7.3"
   langchain_core:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: langchain_core
       sha256: a1d84dba125b568b3a79646fd5b332a07092d80c83e18ccd8b2012b669769f3e
@@ -179,6 +179,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2+1"
+  langchain_openai:
+    dependency: "direct main"
+    description:
+      name: langchain_openai
+      sha256: "5c303cd250165311f0d5e4555d20136a317bf795abd317c5ce17e94dcac8bc23"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.3"
   langchain_tiktoken:
     dependency: transitive
     description:
@@ -259,6 +267,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.2"
+  openai_dart:
+    dependency: transitive
+    description:
+      name: openai_dart
+      sha256: e02ac724eb0a9ec083b014749fefb17f4ecf79828c8cb687ac7623b529733a51
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.3+1"
   path:
     dependency: transitive
     description:
