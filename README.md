@@ -14,6 +14,12 @@
   - [ ] 性格设定（督促单词记忆型）
   - [ ] 对话内容设定
 
+<img src="./README/chat.png" alt="word page" style="zoom:50%;" />
+
+<img src="./README/word.png" alt="word page" style="zoom:50%;" />
+
+<img src="./README/collection.png" alt="word page" style="zoom:50%;" />
+
 ### 环境搭建
 
 ##### Software requirements
